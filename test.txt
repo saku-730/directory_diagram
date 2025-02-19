@@ -1,5 +1,1 @@
-├── LICENSE
-├── README.md
-├── main
-├── main.go
-└── test.txt
+└── directory_diagram
