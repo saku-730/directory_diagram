@@ -7,14 +7,17 @@ import (
 )
 
 func main() {
+	// 引数を取得
 	root := "."
-	// 指定されたパスが存在するか確認
+	if len(os.Args) > 1 {
+		root = os.Args[1]
+	}
+
 	if _, err := os.Stat(root); os.IsNotExist(err) {
 		fmt.Println("エラー: 指定されたディレクトリは存在しません:", root)
 		return
 	}
 
-	// ディレクトリ構造を表示
 	printDirectoryStructure(root, "", "├── ", "│   ", "└── ")
 }
 
@@ -22,21 +25,24 @@ func printDirectoryStructure(path, indent, branch, pipe, lastBranch string) {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		fmt.Println("エラー:", err)
+		return
 	}
 
-	for i, entry := range entries {
-		if entry.Name()[0] == '.' {
-			continue
+	var filteredEntries []os.DirEntry
+	for _, entry := range entries {
+		if entry.Name()[0] != '.' {
+			filteredEntries = append(filteredEntries, entry)
 		}
+	}
 
-		isLast := i == len(entries)-1
+	for i, entry := range filteredEntries {
+		isLast := i == len(filteredEntries)-1
 		if isLast {
 			fmt.Println(indent + lastBranch + entry.Name())
 		} else {
 			fmt.Println(indent + branch + entry.Name())
 		}
 
-		// サブディレクトリがある場合、再帰的に処理
 		if entry.IsDir() {
 			newIndent := indent + pipe
 			if isLast {
