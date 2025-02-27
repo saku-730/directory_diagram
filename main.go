@@ -9,9 +9,9 @@ import (
 
 func main() {
 	// オプションのフラグ定義
-	hideHidden := flag.String("h", "y", "隠しファイルを表示しない (y) / 表示する (n)")
-	maxDepth := flag.Int("t", 1, "表示する階層の深さ")
-	outputFile := flag.String("f", "", "ファイルに出力する場合のファイル名")
+	hideHidden := flag.String("h", "y", "hide hidden file(y) / show hidden file(n)")
+	maxDepth := flag.Int("t", 3, "depth of file structure")
+	outputFile := flag.String("f", "", "output file name")
 
 	// フラグのパース
 	flag.Parse()
@@ -28,21 +28,21 @@ func main() {
 		// ファイルの存在確認
 		if _, err := os.Stat(*outputFile); err == nil {
 			// ファイルが存在している場合
-			fmt.Printf("警告: ファイル '%s' はすでに存在します。\n", *outputFile)
-			fmt.Print("上書きしますか？ (y/n): ")
+			fmt.Printf("Warning:  '%s' is already exist.\n", *outputFile)
+			fmt.Print("Overwrite？ (y/n): ")
 
 			var userInput string
 			fmt.Scanln(&userInput) // ユーザー入力を受け取る
 
 			if userInput != "y" && userInput != "Y" {
-				fmt.Println("ファイルの上書きはキャンセルされました。")
+				fmt.Println("Overwrite canceled")
 				return
 			}
 		}
 		var err error
 		out, err = os.Create(*outputFile)
 		if err != nil {
-			fmt.Println("エラー: ファイルの作成に失敗しました:", err)
+			fmt.Println("error: Failed to create file.:", err)
 			return
 		}
 		defer out.Close() // 処理が終わったらファイルを閉じる
@@ -52,7 +52,7 @@ func main() {
 
 	// 指定されたパスが存在するか確認
 	if _, err := os.Stat(root); os.IsNotExist(err) {
-		fmt.Println("エラー: 指定されたディレクトリは存在しません:", root)
+		fmt.Println("error: :The specified directory does not exist.", root)
 		return
 	}
 
@@ -68,7 +68,7 @@ func printDirectoryStructure(path, indent, branch, pipe, lastBranch string, hide
 
 	entries, err := os.ReadDir(path)
 	if err != nil {
-		fmt.Fprintln(out, "エラー:", err)
+		fmt.Fprintln(out, "error:", err)
 		return
 	}
 
